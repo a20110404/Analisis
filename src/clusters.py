@@ -119,3 +119,52 @@ if anomalies:
     plt.show()
 else:
     print("No se detectaron anomalías significativas.")
+
+anomaly_info = []
+
+for cluster_idx in range(k):
+    centroid = Mu_t[cluster_idx]
+    cluster_points = np.array(C[cluster_idx])
+    distances = np.linalg.norm(cluster_points - centroid, axis=1)
+    mean_dist = np.mean(distances)
+    std_dist = np.std(distances)
+
+    for i, dist in enumerate(distances):
+        if dist > mean_dist + anomaly_threshold * std_dist:
+            # Buscar el índice original en el DataFrame
+            idx = df[(df['Square Meters'] == cluster_points[i][0]*np.std(x[:,0])+np.mean(x[:,0])) &
+                     (df['Price (£)'] == cluster_points[i][1]*np.std(x[:,1])+np.mean(x[:,1]))].index
+            if len(idx) > 0:
+                idx = idx[0]
+                anomaly_info.append({
+                    'Address': df.iloc[idx]['Address'],
+                    'Neighborhood': df.iloc[idx]['Neighborhood'],
+                    'Price (£)': df.iloc[idx]['Price (£)'],
+                    'Square Meters': df.iloc[idx]['Square Meters']
+                })
+
+# Ahora anomaly_info tiene la información de las casas anómalas
+# las usaremos para hacer web scraping
+
+# Ejemplo de búsqueda web para cada anomalía
+from duckduckgo_search import DDGS
+
+for anomaly in anomaly_info:
+    query = f"{anomaly['Address']} {anomaly['Neighborhood']} house price"
+    print(f"\nBuscando información web para: {query}")
+    with DDGS() as ddgs:
+        resultados = ddgs.text(query, region="wt-wt", safesearch="Moderate", max_results=3)
+        for r in resultados:
+            print(f"Título: {r['title']}\nURL: {r['href']}\nResumen: {r['body']}\n")
+
+
+# ------------------------------------- WEB SCRAPING -------------------------------------
+from duckduckgo_search import DDGS
+
+for anomaly in anomaly_info:
+    query = f"{anomaly['Address']} {anomaly['Neighborhood']} house price"
+    print(f"\nBuscando información web para: {query}")
+    with DDGS() as ddgs:
+        resultados = ddgs.text(query, region="wt-wt", safesearch="Moderate", max_results=3)
+        for r in resultados:
+            print(f"Título: {r['title']}\nURL: {r['href']}\nResumen: {r['body']}\n")
