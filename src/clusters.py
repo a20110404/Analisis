@@ -156,6 +156,7 @@ for anomaly in anomaly_info:
         resultados = ddgs.text(query, region="wt-wt", safesearch="Moderate", max_results=3)
         for r in resultados:
             print(f"Título: {r['title']}\nURL: {r['href']}\nResumen: {r['body']}\n")
+    time.sleep(2)  # Espera 2 segundos entre búsquedas
 
 
 # ------------------------------------- WEB SCRAPING -------------------------------------
@@ -168,3 +169,4 @@ for anomaly in anomaly_info:
         resultados = ddgs.text(query, region="wt-wt", safesearch="Moderate", max_results=3)
         for r in resultados:
             print(f"Título: {r['title']}\nURL: {r['href']}\nResumen: {r['body']}\n")
+    time.sleep(2)  # Espera 2 segundos entre búsquedas
